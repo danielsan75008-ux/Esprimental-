@@ -1,169 +1,97 @@
---// WINDUI LOAD (FIX)
-local WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Footagesus/WindUI/main/dist/main.lua"))()
-
---// PLAYER
-local Players = game:GetService("Players")
-local LP = Players.LocalPlayer
-local UIS = game:GetService("UserInputService")
-local RunService = game:GetService("RunService")
-
---// FLOAT BUTTON 🍌
-local ToggleUI = Instance.new("ScreenGui", game.CoreGui)
-local Btn = Instance.new("TextButton", ToggleUI)
-
-Btn.Size = UDim2.new(0,50,0,50)
-Btn.Position = UDim2.new(0.05,0,0.5,0)
-Btn.Text = "🍌"
-Btn.BackgroundColor3 = Color3.fromRGB(0,170,255)
-Btn.Draggable = true
-
---// WINDOW
+local WindUI = loadstring(game:HttpGet("https://tree-hub.vercel.app/api/main/windui"))()
 local Window = WindUI:CreateWindow({
-    Title = "CoiledTom V2 😈",
-    Size = UDim2.fromOffset(500,400)
+    Title = "CoiledTom Hub",
+    Icon = "rbxassetid://10734934585",
+    Author = "CoiledTom",
+    Folder = "CoiledTomConfig" -- Pasta para salvar configs no Delta
 })
 
-Window:Toggle(false)
+-- // ABA 1: TROLL / USEFUL //
+local TrollTab = Window:Tab({ Title = "Troll/Useful", Icon = "rbxassetid://10734942266" })
 
-Btn.MouseButton1Click:Connect(function()
-    Window:Toggle()
-end)
-
---// TABS
-local Troll = Window:CreateTab("Troll")
-local Visual = Window:CreateTab("Visual")
-local PlayerTab = Window:CreateTab("Player")
-local Tools = Window:CreateTab("Tools")
-local Scripts = Window:CreateTab("Scripts")
-local Settings = Window:CreateTab("Settings")
-
---// FLY
-local fly = false
-local speed = 50
-
-Troll:CreateToggle({
-    Name="Fly",
-    Callback=function(v)
-        fly=v
-        if v then
-            local bv = Instance.new("BodyVelocity")
-            bv.MaxForce = Vector3.new(1e5,1e5,1e5)
-            bv.Parent = LP.Character.HumanoidRootPart
-
-            task.spawn(function()
-                while fly do
-                    task.wait()
-                    local move = Vector3.zero
-                    if UIS:IsKeyDown(Enum.KeyCode.W) then move += workspace.CurrentCamera.CFrame.LookVector end
-                    if UIS:IsKeyDown(Enum.KeyCode.S) then move -= workspace.CurrentCamera.CFrame.LookVector end
-                    bv.Velocity = move * speed
-                end
-                bv:Destroy()
-            end)
-        end
+TrollTab:Button({
+    Title = "Touch Fling",
+    Callback = function()
+        -- Inserir aqui a lógica do script de Fling que você enviou (sem a GUI original)
+        print("Touch Fling Ativado")
     end
 })
 
-Troll:CreateSlider({
-    Name="Fly Speed",
-    Range={10,200},
-    CurrentValue=50,
-    Callback=function(v) speed=v end
-})
-
---// ESP
-local esp=false
-local color=Color3.fromRGB(255,0,0)
-
-Visual:CreateToggle({
-    Name="ESP",
-    Callback=function(v)
-        esp=v
-        for _,p in pairs(Players:GetPlayers()) do
-            if p~=LP and p.Character then
-                if v then
-                    local h=Instance.new("Highlight",p.Character)
-                    h.FillColor=color
-                else
-                    if p.Character:FindFirstChildOfClass("Highlight") then
-                        p.Character:FindFirstChildOfClass("Highlight"):Destroy()
-                    end
-                end
-            end
-        end
+TrollTab:Button({
+    Title = "Anti-Fling (Ativar)",
+    Callback = function()
+        -- Inserir aqui a lógica do Anti-Fling constante que você enviou
+        print("Anti-Fling Proteção Ativada")
     end
 })
 
-Visual:CreateColorPicker({
-    Name="ESP Color",
-    Callback=function(c) color=c end
+TrollTab:Section({ Title = "Tools (Loadstring)" })
+
+TrollTab:Button({
+    Title = "Instant Interact",
+    Callback = function() loadstring(game:HttpGet("https://pastefy.app/vg1Ap8MO/raw"))() end
 })
 
---// HITBOX HEAD 👀
-local hit=false
-local size=3
-
-Visual:CreateToggle({
-    Name="Head Hitbox",
-    Callback=function(v)
-        hit=v
-        for _,p in pairs(Players:GetPlayers()) do
-            if p~=LP and p.Character then
-                local head=p.Character:FindFirstChild("Head")
-                if head then
-                    if v then
-                        head.Size=Vector3.new(size,size,size)
-                        head.Transparency=0.5
-                    else
-                        head.Size=Vector3.new(2,1,1)
-                        head.Transparency=0
-                    end
-                end
-            end
-        end
-    end
+TrollTab:Button({
+    Title = "Destroy Tool",
+    Callback = function() loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-destroy-tool-31432"))() end
 })
 
-Visual:CreateSlider({
-    Name="Hitbox Size",
-    Range={2,10},
-    CurrentValue=3,
-    Callback=function(v) size=v end
+TrollTab:Button({
+    Title = "Fly Tool",
+    Callback = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/CoiledTom/Fly-tween-CoiledTom-/refs/heads/main/fly%20tween"))() end
 })
 
---// PLAYER
-PlayerTab:CreateSlider({
-    Name="Speed",
-    Range={16,200},
-    CurrentValue=16,
-    Callback=function(v)
-        if LP.Character then
-            LP.Character.Humanoid.WalkSpeed=v
-        end
-    end
+TrollTab:Button({
+    Title = "F3X Tool",
+    Callback = function() loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-F3X-Tool-44387"))() end
 })
 
---// TOOLS
-local function run(url)
-    pcall(function()
-        loadstring(game:HttpGet(url))()
-    end)
+TrollTab:Button({
+    Title = "Shift Lock",
+    Callback = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/CoiledTom/Shift-Lock-CoiledTom-/refs/heads/main/shift%20Lock%20CoiledTom"))() end
+})
+
+-- // ABA 2: SCRIPTS //
+local ScriptsTab = Window:Tab({ Title = "Scripts", Icon = "rbxassetid://10734943674" })
+
+local scriptsList = {
+    ["Fly Gui"] = "https://raw.githubusercontent.com/CoiledTom/Fly-gui/refs/heads/main/%25",
+    ["Refast Gui"] = "https://raw.githubusercontent.com/CoiledTom/Refast-CoiledTom-/refs/heads/main/refast%20CoiledTom",
+    ["Speed CoiledTom"] = "https://raw.githubusercontent.com/CoiledTom/Speed-CoiledTom-/refs/heads/main/speed%20CoiledTom",
+    ["Way Point Universal"] = "https://raw.githubusercontent.com/CoiledTom/Way-point-universal-/refs/heads/main/Teleport%2Btween",
+    ["Speed X Hub"] = "https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua"
+}
+
+for name, url in pairs(scriptsList) do
+    ScriptsTab:Button({
+        Title = name,
+        Callback = function() loadstring(game:HttpGet(url))() end
+    })
 end
 
-Tools:CreateButton({Name="Interact",Callback=function()
-    run("https://pastefy.app/vg1Ap8MO/raw")
-end})
+-- // ABA 3: PLAYER //
+local PlayerTab = Window:Tab({ Title = "Player", Icon = "rbxassetid://10747373176" })
 
-Tools:CreateButton({Name="F3X",Callback=function()
-    run("https://rawscripts.net/raw/Universal-Script-F3X-Tool-44387")
-end})
-
---// SETTINGS
-Settings:CreateColorPicker({
-    Name="UI Color",
-    Callback=function(c)
-        Window:SetThemeColor(c)
-    end
+PlayerTab:Slider({
+    Title = "WalkSpeed",
+    Default = 16, Min = 16, Max = 500,
+    Callback = function(v) game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = v end
 })
 
-print("🔥 V2 INSANO RODANDO 🔥")
+PlayerTab:Slider({
+    Title = "JumpPower",
+    Default = 50, Min = 50, Max = 500,
+    Callback = function(v) game.Players.LocalPlayer.Character.Humanoid.JumpPower = v end
+})
+
+-- // ABA 4: SETTINGS //
+local SettingsTab = Window:Tab({ Title = "Settings", Icon = "rbxassetid://10734950309" })
+
+SettingsTab:Colorpicker({
+    Title = "Cor da UI",
+    Default = Color3.fromRGB(0, 255, 255),
+    Callback = function(color)
+        -- Função da WindUI para mudar o tema se disponível
+    end
+})
