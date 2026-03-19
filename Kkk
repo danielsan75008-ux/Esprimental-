@@ -1,0 +1,169 @@
+--// WINDUI LOAD (FIX)
+local WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Footagesus/WindUI/main/dist/main.lua"))()
+
+--// PLAYER
+local Players = game:GetService("Players")
+local LP = Players.LocalPlayer
+local UIS = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+
+--// FLOAT BUTTON 🍌
+local ToggleUI = Instance.new("ScreenGui", game.CoreGui)
+local Btn = Instance.new("TextButton", ToggleUI)
+
+Btn.Size = UDim2.new(0,50,0,50)
+Btn.Position = UDim2.new(0.05,0,0.5,0)
+Btn.Text = "🍌"
+Btn.BackgroundColor3 = Color3.fromRGB(0,170,255)
+Btn.Draggable = true
+
+--// WINDOW
+local Window = WindUI:CreateWindow({
+    Title = "CoiledTom V2 😈",
+    Size = UDim2.fromOffset(500,400)
+})
+
+Window:Toggle(false)
+
+Btn.MouseButton1Click:Connect(function()
+    Window:Toggle()
+end)
+
+--// TABS
+local Troll = Window:CreateTab("Troll")
+local Visual = Window:CreateTab("Visual")
+local PlayerTab = Window:CreateTab("Player")
+local Tools = Window:CreateTab("Tools")
+local Scripts = Window:CreateTab("Scripts")
+local Settings = Window:CreateTab("Settings")
+
+--// FLY
+local fly = false
+local speed = 50
+
+Troll:CreateToggle({
+    Name="Fly",
+    Callback=function(v)
+        fly=v
+        if v then
+            local bv = Instance.new("BodyVelocity")
+            bv.MaxForce = Vector3.new(1e5,1e5,1e5)
+            bv.Parent = LP.Character.HumanoidRootPart
+
+            task.spawn(function()
+                while fly do
+                    task.wait()
+                    local move = Vector3.zero
+                    if UIS:IsKeyDown(Enum.KeyCode.W) then move += workspace.CurrentCamera.CFrame.LookVector end
+                    if UIS:IsKeyDown(Enum.KeyCode.S) then move -= workspace.CurrentCamera.CFrame.LookVector end
+                    bv.Velocity = move * speed
+                end
+                bv:Destroy()
+            end)
+        end
+    end
+})
+
+Troll:CreateSlider({
+    Name="Fly Speed",
+    Range={10,200},
+    CurrentValue=50,
+    Callback=function(v) speed=v end
+})
+
+--// ESP
+local esp=false
+local color=Color3.fromRGB(255,0,0)
+
+Visual:CreateToggle({
+    Name="ESP",
+    Callback=function(v)
+        esp=v
+        for _,p in pairs(Players:GetPlayers()) do
+            if p~=LP and p.Character then
+                if v then
+                    local h=Instance.new("Highlight",p.Character)
+                    h.FillColor=color
+                else
+                    if p.Character:FindFirstChildOfClass("Highlight") then
+                        p.Character:FindFirstChildOfClass("Highlight"):Destroy()
+                    end
+                end
+            end
+        end
+    end
+})
+
+Visual:CreateColorPicker({
+    Name="ESP Color",
+    Callback=function(c) color=c end
+})
+
+--// HITBOX HEAD 👀
+local hit=false
+local size=3
+
+Visual:CreateToggle({
+    Name="Head Hitbox",
+    Callback=function(v)
+        hit=v
+        for _,p in pairs(Players:GetPlayers()) do
+            if p~=LP and p.Character then
+                local head=p.Character:FindFirstChild("Head")
+                if head then
+                    if v then
+                        head.Size=Vector3.new(size,size,size)
+                        head.Transparency=0.5
+                    else
+                        head.Size=Vector3.new(2,1,1)
+                        head.Transparency=0
+                    end
+                end
+            end
+        end
+    end
+})
+
+Visual:CreateSlider({
+    Name="Hitbox Size",
+    Range={2,10},
+    CurrentValue=3,
+    Callback=function(v) size=v end
+})
+
+--// PLAYER
+PlayerTab:CreateSlider({
+    Name="Speed",
+    Range={16,200},
+    CurrentValue=16,
+    Callback=function(v)
+        if LP.Character then
+            LP.Character.Humanoid.WalkSpeed=v
+        end
+    end
+})
+
+--// TOOLS
+local function run(url)
+    pcall(function()
+        loadstring(game:HttpGet(url))()
+    end)
+end
+
+Tools:CreateButton({Name="Interact",Callback=function()
+    run("https://pastefy.app/vg1Ap8MO/raw")
+end})
+
+Tools:CreateButton({Name="F3X",Callback=function()
+    run("https://rawscripts.net/raw/Universal-Script-F3X-Tool-44387")
+end})
+
+--// SETTINGS
+Settings:CreateColorPicker({
+    Name="UI Color",
+    Callback=function(c)
+        Window:SetThemeColor(c)
+    end
+})
+
+print("🔥 V2 INSANO RODANDO 🔥")
