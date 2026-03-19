@@ -1,222 +1,217 @@
-loadstring(game:HttpGet("https://raw.githubusercontent.com/Footagesus/WindUI/main/main.lua"))()
+-- CoiledTom HUB V3 INSANO 👑🔥
 
 local WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Footagesus/WindUI/main/main.lua"))()
 
 local Window = WindUI:CreateWindow({
-    Title = "CoiledTom Hub 😈",
-    Icon = "rbxassetid://7733960981",
-    Size = UDim2.new(0, 500, 0, 350),
+    Title = "CoiledTom V3 INSANO 😈",
+    Size = UDim2.new(0, 620, 0, 420),
     Theme = "Dark"
 })
 
--- =========================
--- ABA TROLL
--- =========================
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local RunService = game:GetService("RunService")
+local UIS = game:GetService("UserInputService")
+local Camera = workspace.CurrentCamera
+
 local Troll = Window:CreateTab("Troll/Useful")
+local Scripts = Window:CreateTab("Scripts")
+local PlayerTab = Window:CreateTab("Player")
+local Combat = Window:CreateTab("Combat")
+local Settings = Window:CreateTab("Settings")
 
-local flingEnabled = false
+-- FOV Circle
+local fovCircle = Drawing.new("Circle")
+fovCircle.Visible = false
+fovCircle.Thickness = 2
+fovCircle.NumSides = 100
+fovCircle.Radius = 120
+fovCircle.Color = Color3.fromRGB(255,0,0)
+fovCircle.Filled = false
 
-Troll:CreateToggle({
-    Name = "Touch Fling",
-    Callback = function(v)
-        flingEnabled = v
-        if v then
-            spawn(function()
-                while flingEnabled do
-                    game:GetService("RunService").Heartbeat:Wait()
-                    local hrp = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-                    if hrp then
-                        hrp.Velocity = Vector3.new(0,10000,0)
+RunService.RenderStepped:Connect(function()
+    fovCircle.Position = UIS:GetMouseLocation()
+end)
+local aimbot = false
+local fov = 120
+local smooth = 0.2
+local teamCheck = false
+
+Combat:CreateToggle({Name="Aimbot",Callback=function(v) aimbot=v end})
+Combat:CreateToggle({Name="Team Check",Callback=function(v) teamCheck=v end})
+Combat:CreateToggle({Name="Show FOV",Callback=function(v) fovCircle.Visible=v end})
+
+Combat:CreateSlider({Name="FOV",Min=50,Max=300,Callback=function(v)
+    fov=v
+    fovCircle.Radius=v
+end})
+
+Combat:CreateSlider({Name="Smooth",Min=1,Max=10,Callback=function(v)
+    smooth=v/50
+end})
+
+RunService.RenderStepped:Connect(function()
+    if aimbot then
+        local closest,dist=nil,fov
+        for _,p in pairs(Players:GetPlayers()) do
+            if p~=LocalPlayer and p.Character and p.Character:FindFirstChild("Head") then
+                if teamCheck and p.Team == LocalPlayer.Team then continue end
+                
+                local pos,_=Camera:WorldToViewportPoint(p.Character.Head.Position)
+                local mag=(Vector2.new(pos.X,pos.Y)-UIS:GetMouseLocation()).Magnitude
+                
+                if mag<dist then
+                    closest=p
+                    dist=mag
+                end
+            end
+        end
+        
+        if closest then
+            Camera.CFrame = Camera.CFrame:Lerp(
+                CFrame.new(Camera.CFrame.Position, closest.Character.Head.Position),
+                smooth
+            )
+        end
+    end
+end)
+local esp=false
+local espColor=Color3.fromRGB(255,0,0)
+local showName=true
+local showDistance=true
+
+Combat:CreateToggle({Name="ESP",Callback=function(v) esp=v end})
+Combat:CreateColorPicker({Name="ESP Color",Callback=function(c) espColor=c end})
+Combat:CreateToggle({Name="Show Name",Callback=function(v) showName=v end})
+Combat:CreateToggle({Name="Show Distance",Callback=function(v) showDistance=v end})
+
+RunService.Heartbeat:Connect(function()
+    if esp then
+        for _,p in pairs(Players:GetPlayers()) do
+            if p~=LocalPlayer and p.Character then
+                if not p.Character:FindFirstChild("Highlight") then
+                    local h=Instance.new("Highlight",p.Character)
+                    h.FillColor=espColor
+                end
+                
+                if showName then
+                    local head=p.Character:FindFirstChild("Head")
+                    if head and not head:FindFirstChild("BillboardGui") then
+                        local gui=Instance.new("BillboardGui",head)
+                        gui.Size=UDim2.new(0,100,0,40)
+                        gui.AlwaysOnTop=true
+                        
+                        local txt=Instance.new("TextLabel",gui)
+                        txt.Size=UDim2.new(1,0,1,0)
+                        txt.BackgroundTransparency=1
+                        txt.TextColor3=espColor
+                        txt.Text=p.Name
                     end
                 end
-            end)
+            end
         end
     end
-})
+end)
+-- Hitbox
+local hit=false
+local size=5
+local trans=0.5
 
-Troll:CreateButton({
-    Name = "Ativar Anti-Fling",
-    Callback = function()
-        loadstring([[
+Combat:CreateToggle({Name="Hitbox",Callback=function(v) hit=v end})
+Combat:CreateSlider({Name="Size",Min=2,Max=20,Callback=function(v) size=v end})
+Combat:CreateSlider({Name="Transparency",Min=0,Max=1,Callback=function(v) trans=v end})
 
--- ANTI FLING AQUI (RESUMIDO)
-for _,v in pairs(game.Players:GetPlayers()) do
-    if v ~= game.Players.LocalPlayer then
-        v.CharacterAdded:Connect(function(c)
-            c:WaitForChild("HumanoidRootPart").Changed:Connect(function()
-                c.HumanoidRootPart.Velocity = Vector3.zero
-            end)
-        end)
-    end
-end
-
-        ]])()
-    end
-})
-
--- Fly simples
-local flySpeed = 50
-
-Troll:CreateSlider({
-    Name = "Fly Speed",
-    Min = 10,
-    Max = 200,
-    Default = 50,
-    Callback = function(v)
-        flySpeed = v
-    end
-})
-
-Troll:CreateToggle({
-    Name = "Fly",
-    Callback = function(v)
-        if v then
-            loadstring(game:HttpGet("https://raw.githubusercontent.com/CoiledTom/Fly-tween-CoiledTom-/refs/heads/main/fly%20tween"))()
+RunService.Heartbeat:Connect(function()
+    if hit then
+        for _,p in pairs(Players:GetPlayers()) do
+            if p~=LocalPlayer and p.Character then
+                local h=p.Character:FindFirstChild("Head")
+                if h then
+                    h.Size=Vector3.new(size,size,size)
+                    h.Transparency=trans
+                end
+            end
         end
     end
+end)
+
+-- Player
+PlayerTab:CreateSlider({
+    Name="Speed",
+    Min=16,
+    Max=300,
+    Callback=function(v)
+        LocalPlayer.Character.Humanoid.WalkSpeed=v
+    end
 })
+
+PlayerTab:CreateSlider({
+    Name="Jump",
+    Min=50,
+    Max=300,
+    Callback=function(v)
+        LocalPlayer.Character.Humanoid.JumpPower=v
+    end
+})
+
+local infJump=false
+PlayerTab:CreateToggle({Name="Infinite Jump",Callback=function(v) infJump=v end})
+
+UIS.JumpRequest:Connect(function()
+    if infJump then
+        LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
+    end
+end)
+-- Fling
+local fling=false
+
+Troll:CreateToggle({Name="Touch Fling",Callback=function(v) fling=v end})
+
+RunService.Heartbeat:Connect(function()
+    if fling then
+        local hrp=LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if hrp then
+            hrp.Velocity=Vector3.new(0,10000,0)
+        end
+    end
+end)
 
 -- Tools
-Troll:CreateButton({
-    Name = "Instant Interact",
-    Callback = function()
-        loadstring(game:HttpGet("https://pastefy.app/vg1Ap8MO/raw"))()
-    end
-})
-
-Troll:CreateButton({
-    Name = "Destroy Tool",
-    Callback = function()
-        loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-destroy-tool-31432"))()
-    end
-})
-
-Troll:CreateButton({
-    Name = "Fly Tool",
-    Callback = function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/CoiledTom/Fly-tween-CoiledTom-/refs/heads/main/fly%20tween"))()
-    end
-})
-
-Troll:CreateButton({
-    Name = "F3X Tool",
-    Callback = function()
-        loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-F3X-Tool-44387"))()
-    end
-})
-
-Troll:CreateButton({
-    Name = "Shift Lock",
-    Callback = function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/CoiledTom/Shift-Lock-CoiledTom-/refs/heads/main/shift%20Lock%20CoiledTom"))()
-    end
-})
-
--- =========================
--- ABA SCRIPTS
--- =========================
-local Scripts = Window:CreateTab("Scripts")
-
-local function addScript(name, url)
-    Scripts:CreateButton({
-        Name = name,
-        Callback = function()
-            loadstring(game:HttpGet(url))()
+local function tool(n,u)
+    Troll:CreateButton({
+        Name=n,
+        Callback=function()
+            loadstring(game:HttpGet(u))()
         end
     })
 end
 
-addScript("Fly GUI","https://raw.githubusercontent.com/CoiledTom/Fly-gui/refs/heads/main/%25")
-addScript("Refast","https://raw.githubusercontent.com/CoiledTom/Refast-CoiledTom-/refs/heads/main/refast%20CoiledTom")
-addScript("Speed","https://raw.githubusercontent.com/CoiledTom/Speed-CoiledTom-/refs/heads/main/speed%20CoiledTom")
-addScript("Waypoint","https://raw.githubusercontent.com/CoiledTom/Way-point-universal-/refs/heads/main/Teleport%2Btween")
-addScript("Speed X Hub","https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua")
+tool("Instant Interact","https://pastefy.app/vg1Ap8MO/raw")
+tool("Destroy Tool","https://rawscripts.net/raw/Universal-Script-destroy-tool-31432")
+tool("Fly Tool","https://raw.githubusercontent.com/CoiledTom/Fly-tween-CoiledTom-/refs/heads/main/fly%20tween")
+tool("F3X Tool","https://rawscripts.net/raw/Universal-Script-F3X-Tool-44387")
+tool("Shift Lock","https://raw.githubusercontent.com/CoiledTom/Shift-Lock-CoiledTom-/refs/heads/main/shift%20Lock%20CoiledTom")
 
--- =========================
--- PLAYER
--- =========================
-local Player = Window:CreateTab("Player")
-
-Player:CreateSlider({
-    Name = "Speed",
-    Min = 16,
-    Max = 200,
-    Callback = function(v)
-        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = v
-    end
-})
-
-Player:CreateSlider({
-    Name = "Jump Power",
-    Min = 50,
-    Max = 200,
-    Callback = function(v)
-        game.Players.LocalPlayer.Character.Humanoid.JumpPower = v
-    end
-})
-
-Player:CreateToggle({
-    Name = "Infinite Jump",
-    Callback = function(v)
-        if v then
-            game:GetService("UserInputService").JumpRequest:Connect(function()
-                game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
-            end)
+-- Scripts Tab
+local function scriptBtn(n,u)
+    Scripts:CreateButton({
+        Name=n,
+        Callback=function()
+            loadstring(game:HttpGet(u))()
         end
-    end
-})
+    })
+end
 
--- =========================
--- ESP / HITBOX / AIMBOT
--- =========================
-local Combat = Window:CreateTab("Combat")
-
-local espColor = Color3.fromRGB(255,0,0)
-
-Combat:CreateColorPicker({
-    Name = "ESP Color",
-    Callback = function(c)
-        espColor = c
-    end
-})
-
-Combat:CreateToggle({
-    Name = "ESP",
-    Callback = function(v)
-        for _,p in pairs(game.Players:GetPlayers()) do
-            if p ~= game.Players.LocalPlayer then
-                local box = Instance.new("Highlight", p.Character)
-                box.FillColor = espColor
-                box.Enabled = v
-            end
-        end
-    end
-})
-
-Combat:CreateSlider({
-    Name = "Hitbox Size",
-    Min = 2,
-    Max = 20,
-    Callback = function(v)
-        for _,p in pairs(game.Players:GetPlayers()) do
-            if p ~= game.Players.LocalPlayer then
-                local head = p.Character and p.Character:FindFirstChild("Head")
-                if head then
-                    head.Size = Vector3.new(v,v,v)
-                end
-            end
-        end
-    end
-})
-
--- =========================
--- SETTINGS
--- =========================
-local Settings = Window:CreateTab("Settings")
-
+scriptBtn("Fly GUI","https://raw.githubusercontent.com/CoiledTom/Fly-gui/refs/heads/main/%25")
+scriptBtn("Refast","https://raw.githubusercontent.com/CoiledTom/Refast-CoiledTom-/refs/heads/main/refast%20CoiledTom")
+scriptBtn("Speed","https://raw.githubusercontent.com/CoiledTom/Speed-CoiledTom-/refs/heads/main/speed%20CoiledTom")
+scriptBtn("Waypoint","https://raw.githubusercontent.com/CoiledTom/Way-point-universal-/refs/heads/main/Teleport%2Btween")
+scriptBtn("Speed X Hub","https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua")
 Settings:CreateButton({
-    Name = "Save Config",
-    Callback = function()
-        writefile("CoiledHub_Config.txt","saved 😎")
+    Name="Save Config",
+    Callback=function()
+        writefile("CoiledTom_V3_Config.json", game:GetService("HttpService"):JSONEncode({
+            saved = true
+        }))
     end
 })
